@@ -1,0 +1,6 @@
+# IDE
+.idea
+
+# packets
+poker-pocket-backend/node_modules
+poker-pocket-react-client/node_modules
