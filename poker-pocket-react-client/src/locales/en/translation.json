@@ -1,0 +1,29 @@
+{
+  "LOGIN": "Login",
+  "LOGOUT": "Logout",
+  "REGISTER": "Register",
+
+  "GET_ROOMS": "Get rooms",
+  "SPECTATE": "Spectate",
+  "RANKINGS": "Rankings",
+  "SERVER": "Server",
+  "COMMAND": "Cmd",
+  "SOUNDS_ENABLE": "Enable sounds",
+  "SOUNDS_DISABLE": "Disable sounds",
+
+  "SELECT_ROOM": "Select room",
+  "COMMAND_PROMPT": "Command prompt",
+  "MY_STATISTICS": "My statistics",
+
+  "NOTIFICATION": "Notify",
+
+  "SERVER_INFORMATION": "Server information",
+
+  "PURPLE_TABLE": "Purple table",
+  "BLACK_CARDS": "Black cards",
+  "AUTO_CHECK": "Auto check",
+  "AUTO_PLAY": "Auto play",
+  "CONNECTION": "Connection",
+
+  "CLOSE": "Close"
+}
