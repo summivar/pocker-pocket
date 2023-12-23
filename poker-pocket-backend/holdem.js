@@ -4,7 +4,7 @@
 const dotEnv = require('dotenv');
 dotEnv.config();
 const webSocket = require('nodejs-websocket');
-const initDb = require('./src/database/pgUtils');
+const initDb = require('./src/database/mongoUtils');
 const config = require('./config');
 const utils = require('./src/app/utils');
 const logger = require('./src/app/logger');
