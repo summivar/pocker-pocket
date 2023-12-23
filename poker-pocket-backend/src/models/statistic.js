@@ -1,25 +1,15 @@
-/**
- * User model for database
- * @param sequelize
- * @param type data types
- * @returns {*|void|target}
- */
-module.exports = (sequelize, type) => {
-  return sequelize.define('statistic', {
-    id: {
-      type: type.BIGINT,
-      primaryKey: true,
-      autoIncrement: true
-    },
-    user_id: {
-      type: type.BIGINT,
-      references: {
-        model: 'users', // refers to table name
-        key: 'id', // refers to column name in model value table
-      }
-    },
-    money: type.NUMERIC,
-    win_count: type.INTEGER,
-    lose_count: type.INTEGER,
-  })
-};
+const mongoose = require('mongoose');
+
+const statisticSchema = new mongoose.Schema({
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  money: Number,
+  win_count: Number,
+  lose_count: Number,
+});
+
+const Statistic = mongoose.model('Statistic', statisticSchema);
+
+module.exports = Statistic;

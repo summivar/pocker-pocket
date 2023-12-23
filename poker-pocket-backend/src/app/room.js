@@ -44,7 +44,6 @@ function Room(holdemType, number, eventEmitter, sequelizeObjects) {
   this.holdemType = holdemType; // Number
   this.roomId = number;
   this.eventEmitter = eventEmitter;
-  this.sequelizeObjects = sequelizeObjects;
   this.roomMinBet = config.games.holdEm.holdEmGames[holdemType].minBet;
   this.roomName = 'Room ' + number;
   this.maxSeats = config.games.holdEm.holdEmGames[holdemType].max_seats;
@@ -1228,7 +1227,7 @@ Room.prototype.updateLoggedInPlayerDatabaseStatistics = function (winnerPlayers,
           // this.fancyLogGreen(this.arrayHasValue(winnerPlayers, i));
           if (this.arrayHasValue(winnerPlayers, i)) { // Update win count
             let winStreak = this.arrayHasValue(lastWinnerPlayers, i);
-            dbUtils.UpdatePlayerWinCountPromise(this.sequelizeObjects, this.eventEmitter, this.players[i].playerId, this.players[i].playerDatabaseId, winStreak).then(() => {
+            dbUtils.UpdatePlayerWinCountPromise(this.eventEmitter, this.players[i].playerId, this.players[i].playerDatabaseId, winStreak).then(() => {
             });
             this.players[i].playerWinCount = this.players[i].playerWinCount + 1;
 
@@ -1237,16 +1236,16 @@ Room.prototype.updateLoggedInPlayerDatabaseStatistics = function (winnerPlayers,
             // Update lose count (update only if money is raised up from small and big blinds)
             if (this.totalPot > (this.roomMinBet * this.players.length)) {
               this.players[i].playerLoseCount = this.players[i].playerLoseCount + 1;
-              dbUtils.UpdatePlayerLoseCountPromise(this.sequelizeObjects, this.players[i].playerDatabaseId).then(() => {
+              dbUtils.UpdatePlayerLoseCountPromise(this.players[i].playerDatabaseId).then(() => {
               });
             }
           }
 
           // Update player funds
-          dbUtils.UpdatePlayerMoneyPromise(this.sequelizeObjects, this.players[i].playerDatabaseId, this.players[i].playerMoney).then(() => {
+          dbUtils.UpdatePlayerMoneyPromise(this.players[i].playerDatabaseId, this.players[i].playerMoney).then(() => {
           });
           dbUtils.InsertPlayerStatisticPromise(
-            this.sequelizeObjects, this.players[i].playerDatabaseId,
+            this.players[i].playerDatabaseId,
             this.players[i].playerMoney, this.players[i].playerWinCount,
             this.players[i].playerLoseCount
           ).then(() => {

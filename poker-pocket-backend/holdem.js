@@ -19,7 +19,6 @@ const room = require('./src/app/room'); // Empty object of room
 const player = require('./src/app/player'); // Empty object of player
 
 // Variables
-let sequelizeObjects = null; // Server can host games without database
 let server = null; // webSocket.createServer is created here
 let rooms = []; // All rooms are stored here
 let players = []; // All players are stored here
@@ -34,7 +33,6 @@ let eventEmitter = new events.EventEmitter();
 /* Starting point */
 
 initDb.initDatabase().then(() => {
-  sequelizeObjects = require('./src/database/sequelize'); // This creates tables if not exists and returns table models
   startGames();
 });
 
@@ -403,7 +401,7 @@ function createRoom() {
       type = 2;
       break;
   }
-  rooms.push(new room.Room(Number(type), newRoomId, eventEmitter, sequelizeObjects));
+  rooms.push(new room.Room(Number(type), newRoomId, eventEmitter));
   logger.log("CREATE ROOM WITH TYPE: " + type + " AND ID: " + newRoomId);
 
   // Append bots according to common config
@@ -546,7 +544,7 @@ function serverCommandResult(connectionId, socketKey, boolResult, line1) {
 // Create player account (SHA3-512 password)
 function createAccount(connectionId, socketKey, name, password, email) {
   if (isValidInput({connectionId, socketKey})) {
-    dbUtils.CreateAccountPromise(sequelizeObjects, name, password, email).then(result => {
+    dbUtils.CreateAccountPromise(name, password, email).then(result => {
       if (players[connectionId].connection !== null) {
         responseArray.key = "accountCreated";
         responseArray.data = result;
@@ -561,7 +559,7 @@ function createAccount(connectionId, socketKey, name, password, email) {
 // Login for user account (SHA3-512 password)
 function userLogin(connectionId, socketKey, username, password) {
   if (isValidInput({connectionId, socketKey})) {
-    dbUtils.LoginPromise(sequelizeObjects, username, password).then(result => {
+    dbUtils.LoginPromise(username, password).then(result => {
       if (players[connectionId].connection !== null) {
         responseArray.key = "loginResult";
         responseArray.data = result;
@@ -577,7 +575,7 @@ function userLogin(connectionId, socketKey, username, password) {
 // Set logged in user parameters
 function setLoggedInUserParameters(connectionId, socketKey, username, password) {
   if (isValidInput({connectionId, socketKey})) {
-    dbUtils.GetLoggedInUserParametersPromise(sequelizeObjects, username, password).then(result => {
+    dbUtils.GetLoggedInUserParametersPromise(username, password).then(result => {
       let valid = true;
       for (let i = 0; i < players.length; i++) {
         if (players[i].playerDatabaseId === result.id) {
@@ -612,7 +610,7 @@ function setLoggedInUserParameters(connectionId, socketKey, username, password) 
 // Get logged in user statistics
 function loggedInUserStatistics(connectionId, socketKey) {
   if (isValidInput({connectionId, socketKey}) && players[connectionId].isLoggedInPlayer()) {
-    dbUtils.GetLoggedInUserStatisticsPromise(sequelizeObjects, players[connectionId].playerDatabaseId).then(result => {
+    dbUtils.GetLoggedInUserStatisticsPromise(players[connectionId].playerDatabaseId).then(result => {
       if (players[connectionId].connection !== null) {
         let xpMedalIconAndNextMedalXP = utils.getMedalIconAndNextMedalXP(result.xp);
         const xpNeededForNextMedal = (xpMedalIconAndNextMedalXP.nextMedalXP - result.xp);
@@ -640,7 +638,7 @@ function loggedInUserStatistics(connectionId, socketKey) {
 // Give user more money (rewarding ad shown)
 function rewardingAdShown(connectionId, socketKey) {
   if (isValidInput({connectionId, socketKey}) && players[connectionId].isLoggedInPlayer()) {
-    dbUtils.UpdatePlayerRewardingAdShownPromise(sequelizeObjects, players[connectionId].playerDatabaseId).then(result => {
+    dbUtils.UpdatePlayerRewardingAdShownPromise(players[connectionId].playerDatabaseId).then(result => {
       if (players[connectionId].connection !== null && result.result) {
         responseArray.key = "rewardingAdShownServerResult";
         players[connectionId].connection.sendText(JSON.stringify(responseArray));
@@ -655,7 +653,7 @@ function rewardingAdShown(connectionId, socketKey) {
 // Get rankings of best players
 function getRankings(connectionId, socketKey) {
   if (isValidInput({connectionId, socketKey})) {
-    dbUtils.GetRankingsPromise(sequelizeObjects).then(result => {
+    dbUtils.GetRankingsPromise().then(result => {
       if (players[connectionId].connection !== null) {
         responseArray.key = "getRankingsResult";
         responseArray.code = 200;
@@ -718,7 +716,7 @@ function autoPlayAction(connectionId, socketKey) {
 // Get rankings of best players
 function getPlayerChartData(connectionId, socketKey) {
   if (isValidInput({connectionId, socketKey})) {
-    dbUtils.GetPlayerChartDataPromise(sequelizeObjects, players[connectionId].playerDatabaseId).then(results => {
+    dbUtils.GetPlayerChartDataPromise(players[connectionId].playerDatabaseId).then(results => {
       if (players[connectionId].connection !== null) {
         responseArray.key = "getPlayerChartDataResult";
         responseArray.code = 200;
@@ -735,7 +733,7 @@ function getPlayerChartData(connectionId, socketKey) {
 // Special function for development
 function getSelectedPlayerChartData(connectionId, socketKey, playerId) {
   if (isValidInput({connectionId, socketKey})) {
-    dbUtils.GetPlayerChartDataPromise(sequelizeObjects, playerId).then(results => {
+    dbUtils.GetPlayerChartDataPromise(playerId).then(results => {
       if (players[connectionId].connection !== null) {
         responseArray.key = "getPlayerChartDataResult";
         responseArray.code = 200;
