@@ -12,4 +12,4 @@ poker-pocket-react-client/node_modules
 poker-pocket-backend/.env
 
 # handRanks.dat
-poker-pocket-backend/HandRanks.dat
+poker-pocket-backend/src/app/HandRanks.dat
