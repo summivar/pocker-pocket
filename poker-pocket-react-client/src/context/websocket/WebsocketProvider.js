@@ -28,7 +28,7 @@ const WebSocketProvider = ({ children }) => {
   // ----------------------------------------------------
   // From server commands a.k.a. messages
   const onMessageHandler = (socket) => {
-    socket.handle('connectionId', connectionIdResult);
+    socket.handle('open', open);
     socket.handle('onXPGained', (jsonData) => {
       onXPGained(jsonData.code, jsonData.data);
     });
@@ -37,11 +37,12 @@ const WebSocketProvider = ({ children }) => {
     });
   };
 
-  function connectionIdResult(jsonData) {
+  function open(jsonData) {
     const CONNECTION_ID = Number(jsonData.connectionId);
     setConnId(CONNECTION_ID);
     const SOCKET_KEY = jsonData.socketKey;
     setSocketKey(SOCKET_KEY);
+    localStorage.setItem('skey', SOCKET_KEY);
 
     setSocketConnected({});
   }

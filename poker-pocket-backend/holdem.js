@@ -58,19 +58,8 @@ function startWebSocket() {
   // noinspection JSUnusedLocalSymbols
   return new Promise(function (resolve, reject) {
     server = webSocket.createServer(serverUtils.GetCertOptions(), function (conn) {
-      checkRooms();
-      conn.connectionId = CONNECTION_ID;
-      conn.selectedRoomId = -1;
-      players.push(new player.Player(conn, conn.key, CONNECTION_ID, 10000, false));
-      players[CONNECTION_ID].connection.sendText(JSON.stringify({
-        "key": "connectionId",
-        "socketKey": conn.key,
-        "connectionId": CONNECTION_ID
-      }));
-      logger.log("♣ New connection with connectionId " + CONNECTION_ID);
-      CONNECTION_ID = CONNECTION_ID + 1;
       conn.on('text', function (inputStr) {
-        messageHandler(JSON.parse(inputStr));
+        messageHandler(JSON.parse(inputStr), conn);
       });
       // noinspection JSUnusedLocalSymbols
       conn.on('close', function (code, reason) {
@@ -95,8 +84,37 @@ function startWebSocket() {
 
 
 // Input command message handler
-function messageHandler(input) {
+function messageHandler(input, conn) {
   switch (input.key) {
+    case "open":
+      let index = players.findIndex(player => player.socketKey === input.socketKey);
+      let newPlayer = input.socketKey === null || index === -1;
+      if (newPlayer) {
+        checkRooms();
+        conn.connectionId = CONNECTION_ID;
+        conn.selectedRoomId = -1;
+        players.push(new player.Player(conn, conn.key, CONNECTION_ID, 10000, false));
+        players[CONNECTION_ID].connection.sendText(JSON.stringify({
+          "key": "open",
+          "socketKey": conn.key,
+          "connectionId": CONNECTION_ID
+        }));
+        logger.log("♣ New connection with connectionId " + CONNECTION_ID);
+        CONNECTION_ID = CONNECTION_ID + 1;
+      } else {
+        checkRooms();
+        conn.connectionId = index;
+        conn.selectedRoomId = players[index].selectedRoomId;
+        players[index].connection = conn;
+        players[index].socketKey = conn.key;
+        players[index].connection.sendText(JSON.stringify({
+          "key": "open",
+          "socketKey": conn.key,
+          "connectionId": index
+        }));
+        logger.log("♣ Old connection with connectionId " + CONNECTION_ID);
+      }
+      break;
     case "disconnect":
       logger.log("Disconnect from message handler...");
       players[input.connectionId].connection = null;

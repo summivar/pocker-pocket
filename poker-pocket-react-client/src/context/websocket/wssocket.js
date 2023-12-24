@@ -9,6 +9,10 @@ export const NewWsSocket = (url, onConnect, onClose) => {
   const registerCallbacks = (webSocket) => {
     // WebSocket events
     webSocket.onopen = (event) => {
+      webSocket.send(JSON.stringify({
+        key: 'open',
+        socketKey: localStorage.getItem('skey'),
+      }));
       if (onConnect) onConnect(data);
     };
     webSocket.onmessage = (event) => {
