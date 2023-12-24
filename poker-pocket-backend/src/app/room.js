@@ -40,7 +40,7 @@ Room.HOLDEM_STAGE_TEN_RESULTS = 9;
 
 
 // Constructor
-function Room(holdemType, number, eventEmitter, sequelizeObjects) {
+function Room(holdemType, number, eventEmitter) {
   this.holdemType = holdemType; // Number
   this.roomId = number;
   this.eventEmitter = eventEmitter;
